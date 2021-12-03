@@ -1,11 +1,11 @@
 import { Component } from "@angular/core";
 import { BehaviorSubject } from "rxjs";
 
-type Todo = {
+export type Todo = {
   title: string;
 };
 
-export const mockTodos = [
+export const mockTodos: Todo[] = [
   { title: "Learn Angular" },
   { title: "Add testing with Jest" },
   { title: "Have fun" },

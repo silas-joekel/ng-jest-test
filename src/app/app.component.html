@@ -1,0 +1,7 @@
+<button (click)="addTodo()">Add Todo</button>
+<ul>
+  <li *ngFor="let todo of todos$ | async">
+    {{ todo.title }}
+    <button (click)="removeTodo(todo)">X</button>
+  </li>
+</ul>

@@ -13,16 +13,7 @@ export const mockTodos = [
 
 @Component({
   selector: "app-root",
-  template: `
-    <button (click)="addTodo()">Add Todo</button>
-    <ul>
-      <li *ngFor="let todo of todos$ | async">
-        {{ todo.title }}
-        <button (click)="removeTodo(todo)">X</button>
-      </li>
-    </ul>
-  `,
-  styles: [],
+  templateUrl: "./app.component.html",
 })
 export class AppComponent {
   private _todos = new BehaviorSubject<Todo[]>(mockTodos);

@@ -53,9 +53,11 @@ describe("AppComponent", () => {
     });
 
     it("should add item with title 'First Todo' if todos array is empty", () => {
-      jest
-        .spyOn(component["_todos"], "getValue")
-        .mockReturnValue([]);
+      fixture.debugElement.queryAll(By.css("li")).forEach(listElement => {
+        const removeButton = listElement.query(By.css("button"));
+        removeButton.nativeElement.click();
+        fixture.detectChanges();
+      })
       
       const addButton = fixture.debugElement.query(By.css('button'));
       addButton.nativeElement.click();

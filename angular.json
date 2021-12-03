@@ -107,6 +107,12 @@
           "options": {
             "browserTarget": "ng-jest-test:build"
           }
+        },
+        "test": {
+          "builder": "@angular-builders/jest:run",
+          "options": {
+            
+          }
         }
       }
     }

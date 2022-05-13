@@ -1,3 +1,4 @@
+import { DebugElement } from "@angular/core";
 import { waitForAsync, TestBed } from "@angular/core/testing";
 import { By } from "@angular/platform-browser";
 import { MockedComponentFixture, MockInstance, MockProvider, MockRender, MockReset } from "ng-mocks";
@@ -5,6 +6,20 @@ import { of } from "rxjs";
 import { AppComponent } from "./app.component";
 import { mockTodos } from "./app.interface";
 import { AppService } from "./app.service";
+
+const getNonNestedTextContent = (element: DebugElement) => {
+  const children = element.nativeElement.childNodes as Record<string, ChildNode>;
+  return Object.keys(children)
+    .map(key => children[key])
+    .reduce<string>((text: string, node: ChildNode) => {
+      if (node.nodeType !== 3) return text;
+      return text + node.textContent;
+    }, '');
+}
+
+const byContent = (content: string) =>
+  (element: DebugElement) =>
+    getNonNestedTextContent(element).includes(content)
 
 describe("AppComponent", () => {
   let fixture: MockedComponentFixture<AppComponent>
@@ -35,20 +50,16 @@ describe("AppComponent", () => {
       fixture = MockRender(AppComponent);
     })
 
-    it('should contain 1 li element per todo item', () => {
-      
-      const listElements = fixture.debugElement.queryAll(By.css("li"));
-
-      expect(listElements.length).toBe(mockTodos.length);
-    });
-    it.each([
-      [mockTodos[0].title, 0],
-      [mockTodos[1].title, 1],
-      [mockTodos[2].title, 2],
-    ])("'%s' should be at index %d in the list", (title, index) => {
-      const listElements = fixture.debugElement.queryAll(By.css("li"));
+    it.each(mockTodos.map(mock => mock.title))("Todo '%s' should be visible", (title) => {
+      const todoElement = fixture.debugElement.query(byContent(title));
   
-      expect(listElements[index].nativeElement.textContent).toContain(title);
+      expect(todoElement).not.toBeNull();
+    });
+
+    it("should not contain unknown todo item", () => {
+      const todoElement = fixture.debugElement.query(byContent('Nothing to do'));
+  
+      expect(todoElement).toBeNull();
     });
   });
 
@@ -59,17 +70,17 @@ describe("AppComponent", () => {
     it("should call service.addTodo when 'Add Todo' button is clicked", () => {
       const addTodoSpy = jest.spyOn(TestBed.inject(AppService), 'addTodo');
   
-      const addButton = fixture.debugElement.query(By.css('button'));
+      const addButton = fixture.debugElement.query(byContent('Add Todo'));
       addButton.nativeElement.click();
       fixture.detectChanges();
   
       expect(addTodoSpy).toHaveBeenCalledTimes(1);
     });
   
-    it("should call service.removeTodo when X button was clicked on a list element", () => {
+    it("should call service.removeTodo when X button was clicked on a the second todo item", () => {
       const removeTodoSpy = jest.spyOn(TestBed.inject(AppService), 'removeTodo');
   
-      const removeButton = fixture.debugElement.queryAll(By.css("li"))[1].query(By.css("button"));
+      const removeButton = fixture.debugElement.query(byContent(mockTodos[1].title)).query(byContent('X'));
       removeButton.nativeElement.click();
       fixture.detectChanges();
   
